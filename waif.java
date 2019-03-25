@@ -1,3 +1,5 @@
+//https://open.kattis.com/problems/waif
+
 import java.util.*; 
 import java.lang.*; 
 import java.io.*; 
