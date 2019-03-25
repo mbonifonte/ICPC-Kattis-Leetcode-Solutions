@@ -1,3 +1,5 @@
+//https://open.kattis.com/problems/anewalphabet
+
 import sys
 
 thisdict = {
