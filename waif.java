@@ -99,78 +99,123 @@ public class waif
         // Return the overall flow 
         return max_flow; 
     } 
-
-
-
-    public static String tomography(int graph[][], int s, int t, int V, int sum) 
-    { if(fordFulkerson(graph, 0, t, V) == sum)
-        {
-            System.out.print("Yes");
-        }
-        else
-        {
-            System.out.print("No");
-        }
-    }
-        
   
 // Driver program to test above functions 
 public static void main (String[] args) throws java.lang.Exception
 {
+        int toyGraph[][];
         int mfGraph[][];
 
         Scanner input = new Scanner(System.in);    
 
-        int rows = input.nextInt();
-        int columns = input.nextInt();
+        int childCount = input.nextInt();
+        int toyCount = input.nextInt();
+        int categoryCount = input.nextInt();
+//Creates an n x m matrix
+        int childGraph[][] = new int[childCount][toyCount + 1];
+
+        //Create the distance graph of size |p|x|m|
+        toyGraph = new int[categoryCount][toyCount+2];
 
         //Create the flight graph of size |toys + child + 2| x |toys + child + 2|
 
-        mfGraph = new int[rows + columns + (rows*columns) + 2][rows + columns + (rows*columns) + 2];
+        mfGraph = new int[(categoryCount +toyCount + childCount + 2)][(categoryCount +toyCount + childCount + 2)];
 
-        //Connects rows to target
-
-    int sum = 0;
-
-    for(int i = 1; i <= rows; i++)
+        //Store the children into graph
+    for(int i = 1; i <= childCount; i++)
     {
-        int curr = input.nextInt();
-        mfGraph[i + columns + (rows*columns)][rows + columns + (rows*columns) + 1] = curr;
-        sum += curr;
-    }
-
-    //Connects start vertex to columns
-     for(int i = 1; i <= columns; i++)
-    {
-        mfGraph[0][i] = input.nextInt();
-    }
-
-    //Connects every column to its column/row node
-    for(int i =1; i <= columns; i++)
-    {
-        for(int j = 1; j <= rows; j++)
+        int k = input.nextInt();
+        childGraph[i-1][0] = k;
+        for(int j = 0; j <= k-1; j++)
         {
-            mfGraph[i][ (j-1) + 1 + columns + ((i-1)*rows)] = 1;
+            childGraph[i-1][j+1 ]= input.nextInt();
         }
     }
 
-    int counter = 1; 
 
-    for(int i = 1; i <= rows; i++)
+   if(categoryCount != 0){
+
+    for(int i = 1; i <= categoryCount; i++)
     {
-
-        for(int j = 1; j <= columns; j++)
+        int l = input.nextInt();
+        toyGraph[i-1][0] = l;
+        for(int j = 0; j <= l; j++)
         {
-            mfGraph[counter + columns + ((i-1)*rows)][columns + (rows*columns) + counter] = 1;
+            toyGraph[i-1][j+1] = input.nextInt();
         }
+    }
+}
 
-        counter++;
+
+
+
+
+
+   //Connect source to categories
+    for(int i = 1; i <= categoryCount; i++)
+    {
+        int l = toyGraph[i-1][0];
+        
+         mfGraph[0][i] = toyGraph[i-1][(l+1)];
+    }
+    
+    
+    //Connect categories to toys
+   if(categoryCount != 0){
+
+
+    for(int i = 1; i <= categoryCount; i++)
+    {
+        int l = toyGraph[i-1][0];
+        for(int j = 0; j <= l-1; j++)
+        {
+         mfGraph[i][categoryCount + toyGraph[i-1][(j+1)]] = 1;
+        }
+    }
+}
+
+    //Connects source to uncategorized toys
+    for(int i = 1; i <= toyCount; i++)
+    {
+        int counter = 0;
+        for(int j = 1; j <= categoryCount; j++)
+        {
+            int l = toyGraph[j-1][0];
+            for(int k = 1; k <= l; k++)
+             {
+             if(toyGraph[j-1][k] == i)
+                {
+                    counter++;
+            }
+         }
+    }
+    if(counter == 0)
+        {
+            mfGraph[0][categoryCount + i] = 1;
+        }
+}
+
+
+    //Connects toys to children
+
+    for(int i = 1; i <= childCount;i++)
+    {
+        int k = childGraph[i-1][0];
+        for(int j = 0; j <= k-1; j++)
+        {
+          mfGraph[categoryCount + (childGraph[i-1][j + 1])][(i + categoryCount + toyCount )] = 1;
+        }
     }
 
-  
+    //connect children to target
+    for(int i = 1; i <= childCount; i++)
+    {
+        mfGraph[i + toyCount + categoryCount][(categoryCount + toyCount + childCount + 1)] = 1;
+    }
 
 
-System.out.print(tomography(mfGraph, 0, columns + rows + (rows*columns) + 1, columns + rows + (rows*columns) + 2, sum));
+
+System.out.print(fordFulkerson(mfGraph, 0,categoryCount + toyCount + childCount + 1,categoryCount + toyCount + childCount + 2));
 }
 
-}
+} 
